@@ -27,7 +27,7 @@
 #define ETH_W5500_CS 5
 #endif
 #ifndef ETH_W5500_INT
-#define ETH_W5500_INT -1
+#define ETH_W5500_INT -1  // Disable INT to avoid ISR service conflict (use polling)
 #endif
 #ifndef ETH_W5500_RST
 #define ETH_W5500_RST 4
