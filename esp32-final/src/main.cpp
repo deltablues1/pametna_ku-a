@@ -32,6 +32,11 @@ void setup() {
   Serial.println("Optimized: Fast I2C (400kHz), Fast buttons, Stable web");
   delay(100);
 
+  // Install GPIO ISR service globally (once!) before any interrupt initialization
+  // This prevents "gpio_install_isr_service already installed" errors
+  gpio_install_isr_service(0);
+  Serial.println("[HW] GPIO ISR service installed");
+
   // LED blink to indicate boot
   digitalWrite(LED_STATUS, LOW);  // LED on
   delay(100);
@@ -82,11 +87,18 @@ void setup() {
   Serial.println("[HW] Initializing outputs...");
   outputs_begin();
 
-  Serial.println("[HW] Initializing buttons (fast mode)...");
-  buttons_begin(onBtn);
-
   Serial.println("[HW] Initializing PIR sensors...");
   pir_begin();
+
+  // 2) NETWORK - Initialize BEFORE buttons to avoid ISR service conflict!
+  // W5500 driver will install ISR service, then buttons can attach to it
+  Serial.println("[NET] Initializing network (Ethernet + WiFi fallback)...");
+  netfsm_begin();
+  delay(200); // Give Ethernet time to initialize
+
+  // Initialize buttons AFTER network to avoid ISR service conflict
+  Serial.println("[HW] Initializing buttons (fast mode)...");
+  buttons_begin(onBtn);
 
   if (hw_ok) {
     Serial.println("[HW] Hardware initialization: OK");
@@ -106,10 +118,6 @@ void setup() {
     delay(500);
     digitalWrite(LED_STATUS, HIGH);
   }
-
-  // 2) NETWORK (Ethernet + WiFi FSM)
-  Serial.println("[NET] Initializing network (Ethernet + WiFi fallback)...");
-  netfsm_begin();
 
   // 3) WEB SERVER
   Serial.println("[WEB] Starting web server (optimized)...");
