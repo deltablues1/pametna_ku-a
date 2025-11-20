@@ -11,19 +11,12 @@ static constexpr uint32_t ETH_TIMEOUT_MS  = ETH_FSM_TIMEOUT_MS;
 static constexpr uint32_t WIFI_TIMEOUT_MS = WIFI_FSM_TIMEOUT_MS;
 
 void netfsm_begin() {
-  // TEMPORARY: Skip Ethernet due to ISR service conflict, go straight to WiFi
-  Serial.println(F("[NET] Skipping Ethernet (ISR conflict), using WiFi..."));
-  st = NetInitState::WIFI_TRY;
+  // W5500 library is now auto-patched to handle existing ISR service
+  st = NetInitState::ETH_TRY;
   tStart = millis();
-  Events::logSimple(Events::Type::INIT, Events::Severity::WARN, "NetFSM: Skip ETH, WiFi only");
-  net_begin_wifi_sta_async(); // non-blocking
-
-  // Original code (commented out temporarily):
-  // st = NetInitState::ETH_TRY;
-  // tStart = millis();
-  // Events::logSimple(Events::Type::INIT, Events::Severity::INFO, "NetFSM: ETH_TRY");
-  // Serial.println(F("[NET] Try Ethernet (5s)"));
-  // net_begin_eth_w5500_async(); // non-blocking
+  Events::logSimple(Events::Type::INIT, Events::Severity::INFO, "NetFSM: ETH_TRY");
+  Serial.println(F("[NET] Try Ethernet (5s)"));
+  net_begin_eth_w5500_async(); // non-blocking
 }
 
 void netfsm_loop() {
