@@ -1,3 +1,5 @@
+> 🇭🇷 Hrvatska verzija (ova datoteka) · 🇬🇧 English version: [README.en.md](README.en.md)
+
 # ESP32 Smart Home Controller - FINAL OPTIMIZED v4.0
 
 **Optimizirana verzija koja kombinira najbolje iz esp32beta i esp32 novo verzija.**
